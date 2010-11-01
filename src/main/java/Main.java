@@ -54,7 +54,7 @@ public class Main {
                 AllPageTitles apt = new AllPageTitles(b, namespace);
                 for (String articleName : apt) {
                     logger.info("Getting RDF data for article (" + count + "): " + articleName);
-                    readArticleIntoModel(m, articleName);
+                    readArticleIntoModel(m, wikiUrl, articleName);
                     count++;
                 }
             }
@@ -71,8 +71,8 @@ public class Main {
      * @param m
      * @param articleName
      */
-    private static void readArticleIntoModel(Model m, String articleName) {
-        String rdfUrl = "http://www.crisiswiki.org/Special:ExportRDF/" + articleName;
+    private static void readArticleIntoModel(Model m, String wikiUrl, String articleName) {
+        String rdfUrl = wikiUrl + "Special:ExportRDF/" + articleName;
         logger.debug("RDF URL: " + rdfUrl);
         m.read(rdfUrl);
         logger.info("After reading " + rdfUrl + ", the model contains " + m.size() + " triples");
