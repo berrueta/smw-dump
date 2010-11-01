@@ -28,24 +28,28 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-        String url = "http://www.crisiswiki.org/index.php?title=Main_Page/";
-        MediaWikiBot b = new MediaWikiBot (url);
-        int count = 0;
-        Model m = ModelFactory.createDefaultModel();
-        for (int namespace : MediaWiki.NS_ALL) {
-            logger.info("Getting all pages in namespace " + namespace); // see http://en.wikipedia.org/wiki/Wikipedia:Namespace
-            AllPageTitles apt = new AllPageTitles(b, namespace);
-            for (String articleName : apt) {
-                logger.info("Getting RDF data for article (" + count + "): " + articleName);
-                readArticleIntoModel(m, articleName);
-                count++;
+        if (args.length < 1) {
+            System.err.println("Please provide the URL to the wiki as the first argument, e.g., http://www.crisiswiki.org/");
+        } else {
+            String wikiUrl = args[0];
+            File outputFile = new File(args.length == 2 ? args[1] : "out.rdf");
+            MediaWikiBot b = new MediaWikiBot (wikiUrl);
+            int count = 0;
+            Model m = ModelFactory.createDefaultModel();
+            for (int namespace : MediaWiki.NS_ALL) {
+                logger.info("Getting all pages in namespace " + namespace); // see http://en.wikipedia.org/wiki/Wikipedia:Namespace
+                AllPageTitles apt = new AllPageTitles(b, namespace);
+                for (String articleName : apt) {
+                    logger.info("Getting RDF data for article (" + count + "): " + articleName);
+                    readArticleIntoModel(m, articleName);
+                    count++;
+                }
             }
+            removeMalformedURIs(m);
+            // save data
+            logger.info("Saving " + m.size() + " triples to file " + outputFile + ", " + count + " pages have been retrieved");
+            m.write(new FileWriter(outputFile));
         }
-        removeMalformedURIs(m);
-        // save data
-        logger.info("Saving " + m.size() + " triples to the file, " + count + " pages have been retrieved");
-        File rdfFileOutput = new File("wiki-dump.rdf");
-        m.write(new FileWriter(rdfFileOutput));
     }
 
     private static void readArticleIntoModel(Model m, String articleName) {
