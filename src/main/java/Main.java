@@ -2,7 +2,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
+
+import net.sourceforge.jwbf.mediawiki.actions.MediaWiki;
+import net.sourceforge.jwbf.mediawiki.actions.queries.AllPageTitles;
+import net.sourceforge.jwbf.mediawiki.bots.MediaWikiBot;
 
 import org.apache.log4j.Logger;
 
@@ -11,15 +14,12 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.util.URIref;
-
-import net.sourceforge.jwbf.core.actions.util.ProcessException;
-import net.sourceforge.jwbf.core.contentRep.SimpleArticle;
-import net.sourceforge.jwbf.mediawiki.actions.MediaWiki;
-import net.sourceforge.jwbf.mediawiki.actions.queries.AllPageTitles;
-import net.sourceforge.jwbf.mediawiki.bots.MediaWikiBot;
 
 
+/**
+ * @author Diego Berrueta
+ *
+ */
 public class Main {
     
     private static final Logger logger = Logger.getLogger(Main.class);
