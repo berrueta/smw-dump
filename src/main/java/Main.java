@@ -17,6 +17,19 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 
 /**
+ * Script to extract a RDF dump from a SemanticMediaWiki instance by
+ * means of web requests, i.e., without having local access to the server
+ * or the database.
+ * 
+ * Command line syntax: wikiURL [outputfile.rdf]
+ * 
+ * The wikiURL parameter should be the URL of the wiki, i.e.,
+ * http://www.crisiswiki.org/
+ * 
+ * The second parameter is optional. If specified, the collected
+ * RDF triples will be stored in that file. Otherwise, the
+ * file "out.rdf" is assumed.
+ * 
  * @author Diego Berrueta
  *
  */
@@ -52,6 +65,12 @@ public class Main {
         }
     }
 
+    /**
+     * Fetches the RDF triples about a wiki article and adds them to the model
+     * 
+     * @param m
+     * @param articleName
+     */
     private static void readArticleIntoModel(Model m, String articleName) {
         String rdfUrl = "http://www.crisiswiki.org/Special:ExportRDF/" + articleName;
         logger.debug("RDF URL: " + rdfUrl);
@@ -59,15 +78,19 @@ public class Main {
         logger.info("After reading " + rdfUrl + ", the model contains " + m.size() + " triples");
     }
 
+    /**
+     * Remove buggy resource URIs, i.e., URIs that are not valid
+     * 
+     * @param m
+     */
     private static void removeMalformedURIs(Model m) {
-        // remove buggy resources
         NodeIterator nodeIterator = m.listObjects();
         while (nodeIterator.hasNext()) {
             RDFNode node = nodeIterator.next();
             if (node.canAs(Resource.class)) {
                 Resource resource = node.asResource();
                 try {
-                    new URI(resource.getURI());
+                    new URI(resource.getURI()); // just check if a URI can be constructed from the string
                 } catch (URISyntaxException e) {
                     logger.error("Malformed URI fetched from wiki: " + resource.getURI());
                     logger.info("Removing all triples with object: " + resource.getURI());
