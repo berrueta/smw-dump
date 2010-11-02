@@ -1,7 +1,5 @@
 import java.io.File;
 import java.io.FileWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import net.sourceforge.jwbf.mediawiki.actions.MediaWiki;
 import net.sourceforge.jwbf.mediawiki.actions.queries.AllPageTitles;
@@ -9,6 +7,8 @@ import net.sourceforge.jwbf.mediawiki.bots.MediaWikiBot;
 
 import org.apache.log4j.Logger;
 
+import com.hp.hpl.jena.iri.IRIFactory;
+import com.hp.hpl.jena.iri.impl.IRIImplException;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
@@ -72,7 +72,7 @@ public class Main {
      * @param articleName
      */
     private static void readArticleIntoModel(Model m, String wikiUrl, String articleName) {
-        String rdfUrl = wikiUrl + "Special:ExportRDF/" + articleName;
+        String rdfUrl = wikiUrl + "index.php?title=Special:ExportRDF/" + MediaWiki.encode(articleName);
         logger.debug("RDF URL: " + rdfUrl);
         m.read(rdfUrl);
         logger.info("After reading " + rdfUrl + ", the model contains " + m.size() + " triples");
@@ -84,14 +84,16 @@ public class Main {
      * @param m
      */
     private static void removeMalformedURIs(Model m) {
+        IRIFactory iriFactory = IRIFactory.semanticWebImplementation();
         NodeIterator nodeIterator = m.listObjects();
         while (nodeIterator.hasNext()) {
             RDFNode node = nodeIterator.next();
-            if (node.canAs(Resource.class)) {
+            if (node.isResource()) {
                 Resource resource = node.asResource();
+                logger.info("Checking "  + resource.getURI());
                 try {
-                    new URI(resource.getURI()); // just check if a URI can be constructed from the string
-                } catch (URISyntaxException e) {
+                    iriFactory.construct(resource.getURI()); // just try to construct the IRI, check for exceptions
+                } catch (IRIImplException e) {
                     logger.error("Malformed URI fetched from wiki: " + resource.getURI());
                     logger.info("Removing all triples with object: " + resource.getURI());
                     m.removeAll(null, null, resource);
