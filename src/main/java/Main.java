@@ -6,6 +6,7 @@ import net.sourceforge.jwbf.mediawiki.actions.queries.AllPageTitles;
 import net.sourceforge.jwbf.mediawiki.bots.MediaWikiBot;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.SAXParseException;
 
 import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.iri.impl.IRIImplException;
@@ -14,6 +15,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.shared.JenaException;
 
 
 /**
@@ -74,8 +76,12 @@ public class Main {
     private static void readArticleIntoModel(Model m, String wikiUrl, String articleName) {
         String rdfUrl = wikiUrl + "index.php?title=Special:ExportRDF/" + MediaWiki.encode(articleName);
         logger.debug("RDF URL: " + rdfUrl);
-        m.read(rdfUrl);
-        logger.info("After reading " + rdfUrl + ", the model contains " + m.size() + " triples");
+        try {
+            m.read(rdfUrl);
+            logger.info("After reading " + rdfUrl + ", the model contains " + m.size() + " triples");
+        } catch (JenaException e) {
+            logger.error("Skipped " + rdfUrl + " because of parsing errors", e);
+        }
     }
 
     /**
