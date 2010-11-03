@@ -88,7 +88,7 @@ public class Main {
         NodeIterator nodeIterator = m.listObjects();
         while (nodeIterator.hasNext()) {
             RDFNode node = nodeIterator.next();
-            if (node.isResource()) {
+            if (node.isResource() == true && node.isAnon() == false) {
                 Resource resource = node.asResource();
                 logger.info("Checking "  + resource.getURI());
                 try {
