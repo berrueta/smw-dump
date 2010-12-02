@@ -43,6 +43,11 @@ public class Main {
     private static final Logger logger = Logger.getLogger(Main.class);
 
     /**
+     * Milliseconds between requests
+     */
+    private static final long DELAY_MILIS = 0;
+    
+    /**
      * @param args
      */
     public static void main(String[] args) throws Exception {
@@ -56,15 +61,23 @@ public class Main {
             Model m = ModelFactory.createDefaultModel();
             LinkedList<String> articleNames = new LinkedList<String>();
             for (int namespace : MediaWiki.NS_ALL) {
-                logger.info("Getting all pages in namespace " + namespace); // see http://en.wikipedia.org/wiki/Wikipedia:Namespace
+                logger.info("Geting a list of all pages in namespace " + namespace); // see http://en.wikipedia.org/wiki/Wikipedia:Namespace
                 AllPageTitles apt = new AllPageTitles(b, namespace);
                 articleNames.addAll(asList(apt));
             }
             logger.info("There are " + articleNames.size() + " pages");
+            long startTime = System.currentTimeMillis();
             for (String articleName : articleNames) {
                 logger.info("Getting RDF data for article (" + count + " of " + articleNames.size() + "): " + articleName);
                 readArticleIntoModel(m, wikiUrl, articleName);
+                logger.info("After reading [[" + articleName + "]], the model contains " + m.size() + " triples");
                 count++;
+                long currentTime = System.currentTimeMillis();
+                double progress = (double) count / (double) articleNames.size();
+                long elapsedTime = currentTime-startTime;
+                long remainingTime = Math.round(elapsedTime * (1.0 - progress));
+                logger.info("Elapsed time (sec): " + (currentTime-startTime)/1000 + " -- Progress: " + Math.floor(progress * 100.0) + "% -- Est. remaining time (sec): " + remainingTime/1000);
+                Thread.sleep(DELAY_MILIS);
             }
             removeMalformedURIs(m);
             // save data
@@ -92,7 +105,6 @@ public class Main {
         logger.debug("RDF URL: " + rdfUrl);
         try {
             m.read(rdfUrl);
-            logger.info("After reading " + rdfUrl + ", the model contains " + m.size() + " triples");
         } catch (JenaException e) {
             logger.error("Skipped " + rdfUrl + " because of parsing errors", e);
         }
