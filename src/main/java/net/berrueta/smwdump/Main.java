@@ -1,3 +1,4 @@
+package net.berrueta.smwdump;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -75,7 +76,7 @@ public class Main {
                 long currentTime = System.currentTimeMillis();
                 double progress = (double) count / (double) articleNames.size();
                 long elapsedTime = currentTime-startTime;
-                long remainingTime = Math.round(elapsedTime * (1.0 - progress));
+                long remainingTime = Math.round(elapsedTime * (1-progress) / progress);
                 logger.info("Elapsed time (sec): " + (currentTime-startTime)/1000 + " -- Progress: " + Math.floor(progress * 100.0) + "% -- Est. remaining time (sec): " + remainingTime/1000);
                 Thread.sleep(DELAY_MILIS);
             }
