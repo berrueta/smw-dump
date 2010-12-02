@@ -3,7 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.berrueta</groupId>
 	<artifactId>smw-dump</artifactId>
-	<version>0.1</version>
+	<name>SMW Dump</name>
+	<version>0.2</version>
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge</groupId>
@@ -20,6 +21,8 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
+	<description>A Java script for crawling the RDF data of a Semantic Media Wiki</description>
+	<url>http://github.com/berrueta/smw-dump</url>
 	<build>
 		<plugins>
 			<plugin>
