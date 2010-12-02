@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.util.Collections;
+import java.util.LinkedList;
 
 import net.sourceforge.jwbf.mediawiki.actions.MediaWiki;
 import net.sourceforge.jwbf.mediawiki.actions.queries.AllPageTitles;
@@ -52,20 +54,31 @@ public class Main {
             MediaWikiBot b = new MediaWikiBot (wikiUrl);
             int count = 0;
             Model m = ModelFactory.createDefaultModel();
+            LinkedList<String> articleNames = new LinkedList<String>();
             for (int namespace : MediaWiki.NS_ALL) {
                 logger.info("Getting all pages in namespace " + namespace); // see http://en.wikipedia.org/wiki/Wikipedia:Namespace
                 AllPageTitles apt = new AllPageTitles(b, namespace);
-                for (String articleName : apt) {
-                    logger.info("Getting RDF data for article (" + count + "): " + articleName);
-                    readArticleIntoModel(m, wikiUrl, articleName);
-                    count++;
-                }
+                articleNames.addAll(asList(apt));
+            }
+            logger.info("There are " + articleNames.size() + " pages");
+            for (String articleName : articleNames) {
+                logger.info("Getting RDF data for article (" + count + " of " + articleNames.size() + "): " + articleName);
+                readArticleIntoModel(m, wikiUrl, articleName);
+                count++;
             }
             removeMalformedURIs(m);
             // save data
             logger.info("Saving " + m.size() + " triples to file " + outputFile + ", " + count + " pages have been retrieved");
             m.write(new FileOutputStream(outputFile)); // avoid FileWriter, see http://jena.sourceforge.net/IO/iohowto.html#encoding
         }
+    }
+
+    private static LinkedList<String> asList(AllPageTitles apt) {
+        LinkedList<String> articleNames = new LinkedList<String>();
+        for (String articleName : apt) {
+            articleNames.add(articleName);
+        }
+        return articleNames;
     }
 
     /**
