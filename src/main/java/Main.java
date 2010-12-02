@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 
 import net.sourceforge.jwbf.mediawiki.actions.MediaWiki;
@@ -63,7 +64,7 @@ public class Main {
             removeMalformedURIs(m);
             // save data
             logger.info("Saving " + m.size() + " triples to file " + outputFile + ", " + count + " pages have been retrieved");
-            m.write(new FileWriter(outputFile));
+            m.write(new FileOutputStream(outputFile)); // avoid FileWriter, see http://jena.sourceforge.net/IO/iohowto.html#encoding
         }
     }
 
