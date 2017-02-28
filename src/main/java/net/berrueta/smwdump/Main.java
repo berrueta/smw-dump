@@ -2,8 +2,6 @@ package net.berrueta.smwdump;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.util.Collections;
 import java.util.LinkedList;
 
 import net.sourceforge.jwbf.mediawiki.actions.MediaWiki;
@@ -11,7 +9,6 @@ import net.sourceforge.jwbf.mediawiki.actions.queries.AllPageTitles;
 import net.sourceforge.jwbf.mediawiki.bots.MediaWikiBot;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXParseException;
 
 import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.iri.impl.IRIImplException;
