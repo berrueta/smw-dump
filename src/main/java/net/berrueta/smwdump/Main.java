@@ -18,6 +18,8 @@ import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.JenaException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Script to extract a RDF dump from a SemanticMediaWiki instance by means of
@@ -98,13 +100,16 @@ public class Main {
      * @param articleName
      */
     private static void readArticleIntoModel(Model m, String wikiUrl, String articleName) {
-        String rdfUrl = wikiUrl + "index.php?title=Special:ExportRDF/" + MediaWiki.encode(articleName);
-        logger.debug("RDF URL: " + rdfUrl);
+        String rdfUrlString = wikiUrl + "index.php?title=Special:ExportRDF/" + MediaWiki.encode(articleName);
         try {
-            m.read(rdfUrl);
+            URL rdfUrl = new URL(rdfUrlString);
+            logger.debug("RDF URL: " + rdfUrl);
+            HttpURLConnection urlConnection = (HttpURLConnection) rdfUrl.openConnection();
+            urlConnection.setRequestProperty("User-Agent", "net.berrueta.smw-dump");
+            m.read(urlConnection.getInputStream(), rdfUrlString);
         }
-        catch (JenaException e) {
-            logger.error("Skipped " + rdfUrl + " because of parsing errors", e);
+        catch (Exception e) {
+            logger.error("Skipped " + rdfUrlString + " because of parsing errors", e);
         }
     }
 
